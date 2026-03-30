@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 1 Quiz — IT Project Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0f14; --surface: #161920; --surface2: #1e2130;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+    --accent: #f76f8e; --accent-soft: rgba(247,111,142,0.1);
+    --success: #34d48a; --success-soft: rgba(52,212,138,0.1);
+    --danger: #f76f6f; --danger-soft: rgba(247,111,111,0.1);
+    --text: #e8eaf0; --text-muted: #7a7f94; --text-dim: #4a5068;
+    --mono: 'Space Mono', monospace; --sans: 'Sora', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem; }
+  body::before { content: ''; position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(247,111,142,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  .header { text-align: center; margin-bottom: 2.5rem; position: relative; z-index: 1; }
+  .tag { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(247,111,142,0.2); padding: 4px 12px; border-radius: 99px; margin-bottom: 1rem; }
+  h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 600; letter-spacing: -0.03em; color: #fff; line-height: 1.2; margin-bottom: 0.5rem; }
+  .subtitle { font-size: 14px; color: var(--text-muted); font-weight: 300; }
+  .quiz-wrap { width: 100%; max-width: 660px; position: relative; z-index: 1; }
+  .progress-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .progress-label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+  .progress-track { width: 100%; height: 3px; background: var(--surface2); border-radius: 99px; margin-bottom: 1.75rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #f76f8e, #ffadc0); border-radius: 99px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-bottom: 1rem; animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .section-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 14px; }
+  .section-badge::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: 0.5; }
+  .q-text { font-size: 16px; font-weight: 500; line-height: 1.6; color: #fff; margin-bottom: 1.25rem; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt { display: flex; align-items: center; gap: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; cursor: pointer; font-size: 14px; color: var(--text); font-family: var(--sans); text-align: left; transition: all 0.15s ease; }
+  .opt:hover:not(:disabled) { background: #252a3a; border-color: var(--border2); }
+  .opt:disabled { cursor: default; }
+  .opt.correct { background: var(--success-soft); border-color: rgba(52,212,138,0.3); color: var(--success); }
+  .opt.wrong { background: var(--danger-soft); border-color: rgba(247,111,111,0.3); color: var(--danger); }
+  .opt.revealed { background: rgba(52,212,138,0.06); border-color: rgba(52,212,138,0.2); color: rgba(52,212,138,0.6); }
+  .opt-letter { font-family: var(--mono); font-size: 11px; font-weight: 700; min-width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .feedback { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 13px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; animation: fadeUp 0.2s ease; }
+  .feedback.correct { background: var(--success-soft); color: var(--success); border: 1px solid rgba(52,212,138,0.15); }
+  .feedback.wrong { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(247,111,111,0.15); }
+  .next-btn { display: flex; align-items: center; gap: 8px; margin-top: 1rem; padding: 11px 22px; background: var(--accent-soft); border: 1px solid rgba(247,111,142,0.25); border-radius: 10px; color: var(--accent); font-family: var(--sans); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .next-btn:hover { background: rgba(247,111,142,0.2); }
+  .next-btn .arrow { transition: transform 0.15s; }
+  .next-btn:hover .arrow { transform: translateX(3px); }
+  .results { text-align: center; padding: 3rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; animation: fadeUp 0.4s ease; }
+  .score-ring { width: 120px; height: 120px; margin: 0 auto 1.5rem; position: relative; }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .score-pct { font-family: var(--mono); font-size: 26px; font-weight: 700; color: #fff; }
+  .score-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .result-title { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+  .result-msg { font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 360px; margin: 0 auto 1.75rem; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.75rem; }
+  .stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .stat-n { font-family: var(--mono); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .stat-n.green { color: var(--success); } .stat-n.red { color: var(--danger); } .stat-n.pink { color: var(--accent); }
+  .stat-l { font-size: 11px; color: var(--text-muted); }
+  .restart-btn { padding: 12px 28px; background: transparent; border: 1px solid var(--border2); border-radius: 10px; color: var(--text); font-family: var(--sans); font-size: 14px; cursor: pointer; transition: all 0.15s; }
+  .restart-btn:hover { background: var(--surface2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="tag">Week 2 · IT Project Management · SEU</div>
+  <h1>Module 1 Quiz</h1>
+  <p class="subtitle">Introduction to Project Management: Concepts and Definitions</p>
+</div>
+
+<div class="quiz-wrap">
+  <div class="progress-row">
+    <span class="progress-label" id="prog-label">1 of 30</span>
+    <span class="progress-label" id="score-live">Score: 0</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div id="quiz-body"></div>
+</div>
+
+<script>
+const questions = [
+  {section:"Introduction",q:"Until the 1980s, project management primarily focused on providing schedule and resource data to which industries?",opts:["Healthcare, education, and retail","Military, computer, and construction","Banking, insurance, and finance","Transportation, energy, and agriculture"],ans:1,exp:"Until the 1980s, project management primarily focused on providing schedule and resource data to top management in the military, computer, and construction industries."},
+  {section:"Introduction",q:"According to Gartner, worldwide IT spending was projected to total how much in 2021?",opts:["$1.2 trillion","$2.5 trillion","$4.1 trillion","$6.8 trillion"],ans:2,exp:"According to the latest forecast by Gartner, worldwide IT spending was projected to total $4.1 trillion in 2021, an increase of 8.4% from 2020."},
+  {section:"Introduction",q:"According to PMI's Pulse of the Profession report, how much do organizations waste for every $1 billion spent on projects?",opts:["$25 million","$50 million","$97 million","$150 million"],ans:2,exp:"Organizations waste $97 million for every $1 billion spent on projects, according to PMI's Pulse of the Profession report."},
+  {section:"Introduction",q:"Approximately how much of the world's gross product is spent on projects of all kinds?",opts:["$2 trillion","$10 trillion","$20 trillion","$40 trillion"],ans:1,exp:"The world as a whole spends nearly $10 trillion of its $40.7 trillion gross product on projects of all kinds."},
+  {section:"Introduction",q:"In 2017, which country had the highest average annual salary for project management professionals?",opts:["United States","Germany","Switzerland","Australia"],ans:2,exp:"In 2017, the average annual salary for project management was $130,866 in Switzerland, the highest-paid country."},
+  {section:"Introduction",q:"Which of the following is listed as an advantage of using project management techniques?",opts:["Longer development times","Higher worker morale and better internal coordination","Reduced need for stakeholder involvement","Lower quality in favor of speed"],ans:1,exp:"Advantages of project management include better control of resources, improved customer relations, shorter development times, lower costs, higher quality, higher profit margins, better internal coordination, and higher worker morale."},
+  {section:"What is a Project",q:"According to the PMBOK Guide, a project is best defined as:",opts:["Ongoing operations used to sustain the business","A temporary endeavor undertaken to create a unique product, service, or result","A long-term strategic plan for an organization","A department's annual budget and work plan"],ans:1,exp:"A project is 'a temporary endeavor undertaken to create a unique product, service, or result' (PMBOK Guide, Fourth Edition, 2008)."},
+  {section:"What is a Project",q:"What is the key difference between a project and operations?",opts:["Projects are more expensive than operations","Operations is work done to sustain the business; projects are temporary and end when objectives are met","Projects always involve IT systems","Operations always have a defined end date"],ans:1,exp:"Operations is work done to sustain the business, while projects end when their objectives have been reached or the project has been terminated."},
+  {section:"What is a Project",q:"Which attribute states that a project is developed incrementally with increasing detail as more information becomes available?",opts:["A project is temporary","A project has a unique purpose","A project is developed using progressive elaboration","A project involves uncertainty"],ans:2,exp:"A project is developed using progressive elaboration — it is developed incrementally as understanding grows throughout the project life."},
+  {section:"What is a Project",q:"How many attributes are listed to help further define a project?",opts:["4","5","6","7"],ans:3,exp:"Seven attributes help define a project: unique purpose, temporary, drives change and enables value creation, progressive elaboration, requires resources, should have a primary customer or sponsor, and involves uncertainty."},
+  {section:"What is a Project",q:"What are the three goals referred to as the 'triple constraint' in project management?",opts:["Quality, Risk, and Resources","Scope, Time, and Cost","People, Process, and Technology","Budget, Schedule, and Stakeholders"],ans:1,exp:"Every project is constrained by its scope, time, and cost goals. These limitations are referred to as the triple constraint in project management."},
+  {section:"What is a Project",q:"Who do project managers work with to achieve project goals?",opts:["Only the project team","Project sponsors, team, and other people involved in the project","Only senior management","Only external stakeholders"],ans:1,exp:"Project managers work with the project sponsors, team, and the other people involved to achieve project goals."},
+  {section:"Project Management",q:"What is the definition of project management?",opts:["The process of hiring and managing a project team","The application of knowledge, skills, tools and techniques to project activities to meet project requirements","The financial planning and budgeting for projects","The creation of project schedules and Gantt charts"],ans:1,exp:"Project management is 'the application of knowledge, skills, tools and techniques to project activities to meet project requirements' (PMBOK Guide, Fourth Edition, 2008)."},
+  {section:"Project Management",q:"Which of the following is NOT listed as a project stakeholder?",opts:["Project sponsor","Suppliers","Opponents of the project","Government regulators"],ans:3,exp:"Project stakeholders include: the project sponsor, project team, support staff, customers, users, suppliers, and opponents of the project. Government regulators are not specifically listed."},
+  {section:"Project Management",q:"How many core knowledge areas lead directly to specific project objectives (scope, schedule, cost, quality)?",opts:["2","3","4","5"],ans:2,exp:"There are 4 core knowledge areas that lead to specific project objectives: scope, schedule, cost, and quality management."},
+  {section:"Project Management",q:"How many facilitating knowledge areas are the means through which project objectives are achieved?",opts:["4","5","6","7"],ans:1,exp:"There are 5 facilitating knowledge areas: resource, communications, risk, procurement, and stakeholder management."},
+  {section:"Project Management",q:"Which knowledge area affects and is affected by ALL other knowledge areas?",opts:["Project Risk Management","Project Scope Management","Project Integration Management","Project Quality Management"],ans:2,exp:"Project Integration Management is the one knowledge area that affects and is affected by all of the other knowledge areas."},
+  {section:"Project Management",q:"Which tools are listed under the TIME knowledge area?",opts:["Cost estimates and earned value management","Project charter, scope statement, and WBS","Gantt charts, network diagrams, critical path analysis, and critical chain scheduling","Risk registers and stakeholder analysis"],ans:2,exp:"Tools for the time knowledge area include Gantt charts, network diagrams, critical path analysis, and critical chain scheduling."},
+  {section:"Project Management",q:"Which of the following is a way to define project success?",opts:["The project used the most advanced technology","The project met scope, time, and cost goals and satisfied the customer/sponsor","The project had the largest team","The project generated the most documentation"],ans:1,exp:"Project success can be defined as: meeting scope, time, and cost goals; satisfying the customer/sponsor; and meeting the project's main objective such as making/saving money or providing a good return on investment."},
+  {section:"Project Management",q:"What do companies that excel in project delivery capability use?",opts:["The fewest number of team members","An integrated project management toolbox with standard tools, templates, and metrics","Only agile methodologies","Outsourced project management teams"],ans:1,exp:"Companies that excel in project delivery capability use an integrated project management toolbox (standard/advanced PM tools, lots of templates), grow project leaders with business and soft skills, develop a streamlined delivery process, and measure project health using metrics."},
+  {section:"Programs & Portfolios",q:"What is a program in project management?",opts:["A single large project","A group of related projects managed in a coordinated way to obtain benefits not available from managing them individually","A project management software application","A training course for project managers"],ans:1,exp:"A program is 'a group of related projects managed in a coordinated way to obtain benefits and control not available from managing them individually' (PMBOK Guide, Fourth Edition, 2008)."},
+  {section:"Programs & Portfolios",q:"What does a program manager do?",opts:["Manages individual project tasks","Provides leadership and direction for the project managers heading projects within the program","Writes the project charter for each project","Handles the financial accounting for all projects"],ans:1,exp:"A program manager provides leadership and direction for the project managers heading the projects within the program."},
+  {section:"Programs & Portfolios",q:"What is a portfolio in project management?",opts:["A collection of project templates","A collection of projects, programs, subsidiary portfolios, and operations managed as a group to achieve strategic objectives","A single program with multiple phases","A project manager's professional credentials"],ans:1,exp:"A portfolio is a collection of projects, programs, subsidiary portfolios, and operations managed as a group to achieve strategic objectives."},
+  {section:"Programs & Portfolios",q:"How is SUCCESS measured for a PROJECT?",opts:["By the program's ability to deliver intended benefits","By aggregate investment performance","By product and project quality, timeliness, budget compliance, and customer satisfaction","By the number of completed deliverables"],ans:2,exp:"Project success is measured by product and project quality, timeliness, budget compliance, and degree of customer satisfaction."},
+  {section:"Programs & Portfolios",q:"How is success measured for a PROGRAM?",opts:["By meeting the triple constraint","By the program's ability to deliver its intended benefits, and by its efficiency and effectiveness in doing so","By total number of projects completed","By customer satisfaction scores alone"],ans:1,exp:"A program's success is measured by the program's ability to deliver its intended benefits to an organization, and by the program's efficiency and effectiveness in delivering those benefits."},
+  {section:"Role of the PM",q:"Which of the following is NOT listed among the top 10 most important skills for project managers?",opts:["People skills","Leadership","Technical coding ability","Conflict resolution"],ans:2,exp:"The top 10 skills are: people skills, leadership, listening, integrity/ethical behaviour, building trust, verbal communication, building teams, conflict resolution, critical thinking/problem solving, and balancing priorities. Technical coding is not listed."},
+  {section:"Role of the PM",q:"What percentage of successful projects were led by experienced project managers?",opts:["75%","85%","97%","100%"],ans:2,exp:"97% of successful projects were led by experienced project managers, who can often help influence success factors."},
+  {section:"Role of the PM",q:"What is the key difference between a leader and a manager?",opts:["A leader manages budgets; a manager manages people","A leader focuses on long-term goals and inspiring people; a manager deals with day-to-day details of meeting specific goals","A leader works externally; a manager works internally","A leader is more senior than a manager"],ans:1,exp:"A leader focuses on long-term goals and big-picture objectives while inspiring people to reach those goals. A manager deals with the day-to-day details of meeting specific goals. Project managers often take on both roles."},
+  {section:"Role of the PM",q:"For HIGH UNCERTAINTY projects, which skills are most important?",opts:["Technical skills, documentation, and budgeting","Risk management, expectation management, leadership, people skills, and planning","Team building, scheduling, and cost estimation","Verbal communication, listening, and reporting"],ans:1,exp:"For high uncertainty projects, the most important skills are: risk management, expectation management, leadership, people skills, and planning skills."},
+  {section:"Role of the PM",q:"What must applicants agree to in order to earn PMP certification from PMI?",opts:["To work only on IT projects","To PMI's Code of Ethics and Professional Conduct","To complete 500 hours of project work annually","To publish a research paper on project management"],ans:1,exp:"In order to earn PMP certification, applicants must agree to PMI's Code of Ethics and Professional Conduct, have documented sufficient project experience, and pass the PMP exam."},
+  {section:"Role of the PM",q:"Which of the following is described as a 'super tool' with high use and high potential for improving project success?",opts:["Email newsletters","Software for task scheduling and scope statements","Social media updates","Time sheets and expense reports"],ans:1,exp:"'Super tools' include software for task scheduling (such as project management software), scope statements, requirements analyses, and lessons-learned reports — all with high use and high potential for improving project success."},
+];
+
+const shuffled = [...questions].sort(() => Math.random() - 0.5);
+let current = 0, score = 0, answered = false;
+
+function render() {
+  const body = document.getElementById('quiz-body'), total = shuffled.length;
+  if (current >= total) {
+    const pct = Math.round((score / total) * 100);
+    const title = pct >= 80 ? "Excellent work!" : pct >= 60 ? "Good effort!" : "Keep studying!";
+    const msg = pct >= 80 ? "You have a strong grasp of Module 1 material." : pct >= 60 ? "Review the topics you missed and try again." : "Go back over the slides and give it another shot.";
+    const c = 2 * Math.PI * 50, d = (pct / 100) * c;
+    const col = pct >= 80 ? '#34d48a' : pct >= 60 ? '#f76f8e' : '#f76f6f';
+    document.getElementById('prog-fill').style.width = '100%';
+    document.getElementById('prog-label').textContent = 'Complete';
+    document.getElementById('score-live').textContent = '';
+    body.innerHTML = `<div class="results"><div class="score-ring"><svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"/><circle cx="60" cy="60" r="50" fill="none" stroke="${col}" stroke-width="8" stroke-dasharray="${d.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"/></svg><div class="score-center"><div class="score-pct">${pct}%</div><div class="score-sub">${score}/${total}</div></div></div><div class="result-title">${title}</div><div class="result-msg">${msg}</div><div class="stats-grid"><div class="stat"><div class="stat-n green">${score}</div><div class="stat-l">Correct</div></div><div class="stat"><div class="stat-n red">${total - score}</div><div class="stat-l">Incorrect</div></div><div class="stat"><div class="stat-n pink">${total}</div><div class="stat-l">Total</div></div></div><button class="restart-btn" onclick="restart()">↺ Restart quiz</button></div>`;
+    return;
+  }
+  const q = shuffled[current];
+  document.getElementById('prog-fill').style.width = `${(current / shuffled.length) * 100}%`;
+  document.getElementById('prog-label').textContent = `${current + 1} of ${total}`;
+  document.getElementById('score-live').textContent = `Score: ${score}`;
+  body.innerHTML = `<div class="q-card"><div class="section-badge">${q.section}</div><div class="q-text">${q.q}</div><div class="options" id="opts">${q.opts.map((o, i) => `<button class="opt" id="opt${i}" onclick="pick(${i})"><span class="opt-letter">${['A','B','C','D'][i]}</span>${o}</button>`).join('')}</div><div class="feedback" id="fb"></div></div><div id="next-wrap"></div>`;
+  answered = false;
+}
+
+function pick(i) {
+  if (answered) return; answered = true;
+  const q = shuffled[current];
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (i === q.ans) { document.getElementById('opt' + i).classList.add('correct'); fb.className = 'feedback correct show'; fb.innerHTML = '<strong>Correct!</strong> ' + q.exp; score++; }
+  else { document.getElementById('opt' + i).classList.add('wrong'); document.getElementById('opt' + q.ans).classList.add('revealed'); fb.className = 'feedback wrong show'; fb.innerHTML = '<strong>Incorrect.</strong> ' + q.exp; }
+  document.getElementById('score-live').textContent = `Score: ${score}`;
+  document.getElementById('next-wrap').innerHTML = `<button class="next-btn" onclick="next()">${current + 1 < shuffled.length ? 'Next question' : 'See results'} <span class="arrow">→</span></button>`;
+}
+
+function next() { current++; render(); }
+function restart() { current = 0; score = 0; render(); }
+render();
+</script>
+</body>
+</html>
